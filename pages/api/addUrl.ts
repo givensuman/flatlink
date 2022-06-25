@@ -1,6 +1,6 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { PrismaClient } from '@prisma/client'
-import { v4 as uuid } from 'uuid'
+import { nanoid } from 'nanoid'
 
 const prisma = new PrismaClient()
 
@@ -13,15 +13,34 @@ export default async function handler(
         url = 'http://' + url
     }
 
-    const urlExists = await prisma.link.findMany({ where: { url }})
-    if (urlExists.length > 0) 
+    const urlExists = await prisma.link.findMany({ 
+        where: { 
+            url: {
+                equals: url
+            }
+        }
+    })
+    if (urlExists.length > 0) {
         return res.status(201).json(urlExists[0].slug)
-
-    let slug = uuid().substring(0, 8)
-    let slugExists = await prisma.link.findMany({ where: { slug }})
+    }
+    
+    let slug = nanoid(10)
+    let slugExists = await prisma.link.findMany({ 
+        where: { 
+            slug: {
+                equals: slug
+            }
+        }
+    })
     while (slugExists.length > 0) {
-        slug = uuid().substring(0, 8)
-        slugExists = await prisma.link.findMany({ where: { slug }})
+        slug = nanoid(10)
+        slugExists = await prisma.link.findMany({
+            where: { 
+                slug: {
+                    equals: slug
+                }
+            }
+        })
     }
 
     try {
