@@ -1,34 +1,61 @@
 import type { NextPage } from 'next'
-import { useRouter } from 'next/router'
-import { useEffect } from 'react'
-import { useQuery } from 'react-query'
+import Link from 'next/link'
+import { PrismaClient } from '@prisma/client'
+
+const prisma = new PrismaClient()
+
+interface Props {
+    params: {
+        slug: string
+    }
+}
+
+export const getServerSideProps = async ({ params }: Props) => {
+    const { slug } = params
+    // @ts-ignore
+    const data = await prisma.link.findFirst({ where: {
+        slug: {
+            equals: slug
+        }
+    }})
+
+    if (data) {
+        try {
+            return {
+                redirect: {
+                    destination: data.url
+                }
+            }
+        } catch(err) {
+            console.error(err)
+            return {
+                redirect: {
+                    destination: '/'
+                }
+            }
+        }
+    } else {
+        return {
+            redirect: {
+                destination: '/'
+            }
+        }
+    }
+}
 
 const Slug: NextPage = () => {
-
-    const router = useRouter()
-
-    const handleGetUrl = async () => {
-        return await fetch('/api/getUrl', {
-            method: 'POST',
-            body: JSON.stringify({
-                slug: router.query.slug
-            })
-        })
-            .then(res => res.json())
-    }
-
-    const { data, isSuccess, isLoading, isError } = useQuery('get url', handleGetUrl)
-    
-    useEffect(() => { isSuccess && window.location.assign('https://www.google.com/') }, [data, isSuccess])
-
-    if (isLoading) {
-        return (
-            <div className="spinner-border animate-spin inline-block w-4 h-4 border-2 rounded-full border-white" role="status"
-            style={{ borderTopColor: "transparent" }} />
-        )
-    }
-
-    return (<></>)
+    return (<>
+        <div className="flex flex-col justify-center">
+            <h1 className="text-4xl mb-6">
+                Link not found
+            </h1>
+            <Link href="/">
+                <button className="bg-slate-200 px-4 py-2 rounded-md hover:bg-slate-300">
+                    Go back
+                </button>
+            </Link>
+        </div>
+    </>)
 }
 
 export default Slug

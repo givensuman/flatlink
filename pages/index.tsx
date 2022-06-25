@@ -113,7 +113,7 @@ const Home: NextPage = () => {
   return (<AnimatePresence>
     <motion.div
       key="enter url"
-      className="flex flex-col"
+      className="flex flex-col items-center"
       initial={{ x: 50, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.25 }}
@@ -144,7 +144,7 @@ const Home: NextPage = () => {
         </button>
       </div>
       {errorMessage && 
-        <label className="text-red-400 mt-2">
+        <label className="text-red-400 mt-2 mr-auto">
           {errorMessage}
         </label>
       }
