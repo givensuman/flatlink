@@ -12,7 +12,7 @@ interface Props {
 
 export const getServerSideProps = async ({ params }: Props) => {
     const { slug } = params
-    // @ts-ignore
+    
     const data = await prisma.link.findFirst({ where: {
         slug: {
             equals: slug
